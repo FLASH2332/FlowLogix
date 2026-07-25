@@ -95,3 +95,6 @@ The Multi-Agent architecture manages the warehouse across 6 distinct physical st
 ### Stage 6: Dispatch & Logistics (Floor Operations Agent)
 * **What it is:** Shipping packed boxes out via freight carriers.
 * **Key Use Cases:** * **Multi-Carrier Rate Shopping:** Querying multiple shipping APIs to find the cheapest freight carrier that still guarantees delivery before the customer's SLA deadline.
+
+
+nitrostack docs: https://docs.nitrostack.ai/

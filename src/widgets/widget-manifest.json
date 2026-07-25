@@ -2,47 +2,33 @@
   "version": "1.0.0",
   "widgets": [
     {
-      "uri": "/calculator-result",
-      "name": "Calculator Result",
-      "description": "Displays the result of a calculation with operation details",
-      "examples": [
-        {
-          "name": "Addition Example",
-          "description": "Shows the result of adding 5 + 3",
-          "data": {
-            "operation": "add",
-            "a": 5,
-            "b": 3,
-            "result": 8,
-            "expression": "5 + 3 = 8"
-          }
-        },
-        {
-          "name": "Multiplication Example",
-          "description": "Shows the result of multiplying 6 × 7",
-          "data": {
-            "operation": "multiply",
-            "a": 6,
-            "b": 7,
-            "result": 42,
-            "expression": "6 × 7 = 42"
-          }
-        },
-        {
-          "name": "Division Example",
-          "description": "Shows the result of dividing 20 ÷ 4",
-          "data": {
-            "operation": "divide",
-            "a": 20,
-            "b": 4,
-            "result": 5,
-            "expression": "20 ÷ 4 = 5"
-          }
-        }
-      ],
-      "tags": ["calculator", "math", "result"]
+      "uri": "/shipment-incident-card",
+      "name": "Shipment Incident Card",
+      "description": "Displays the OCR details of a damaged shipment for human review",
+      "examples": [],
+      "tags": ["shipment", "incident"]
+    },
+    {
+      "uri": "/emergency-po-approval",
+      "name": "Emergency PO Approval",
+      "description": "HITL widget to approve emergency purchase orders",
+      "examples": [],
+      "tags": ["approval", "po"]
+    },
+    {
+      "uri": "/dock-schedule-tracker",
+      "name": "Dock Schedule Tracker",
+      "description": "Visual timeline of shifted truck slots and reassigned workers",
+      "examples": [],
+      "tags": ["dock", "schedule"]
+    },
+    {
+      "uri": "/warehouse-health-summary",
+      "name": "Warehouse Health Summary",
+      "description": "Master RED/AMBER/GREEN status dashboard",
+      "examples": [],
+      "tags": ["dashboard", "health"]
     }
   ],
-  "generatedAt": "2025-01-01T00:00:00.000Z"
+  "generatedAt": "2026-07-25T00:00:00.000Z"
 }
-
