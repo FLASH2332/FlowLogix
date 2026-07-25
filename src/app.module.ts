@@ -1,17 +1,21 @@
 import { McpApp, Module, ConfigModule } from '@nitrostack/core';
 import { CalculatorModule } from './modules/calculator/calculator.module.js';
+import { SupplyChainModule } from './modules/supply-chain/supply-chain.module.js';
+import { FloorOpsModule } from './modules/floor-ops/floor-ops.module.js';
 import { SystemHealthCheck } from './health/system.health.js';
 
 /**
- * Root Application Module
- * 
- * This is the main module that bootstraps the MCP server.
- * It registers all feature modules and health checks.
+ * Root Application Module — FlowLogix Warehouse Management System
+ *
+ * Registers all feature modules:
+ *   - CalculatorModule:    Demo/example tools
+ *   - SupplyChainModule:   Supply Chain Agent (UC1: Damaged Freight, UC4: QC Failure)
+ *   - FloorOpsModule:      Floor Operations Agent (UC2: Dock Delays, UC3: Blind Receiving)
  */
 @McpApp({
   module: AppModule,
   server: {
-    name: 'calculator-server',
+    name: 'flowlogix-warehouse-server',
     version: '1.0.0'
   },
   logging: {
@@ -20,10 +24,14 @@ import { SystemHealthCheck } from './health/system.health.js';
 })
 @Module({
   name: 'app',
-  description: 'Root application module',
+  description: 'FlowLogix — AI-Native Warehouse Management System (Stage 1: Inbound & Receiving)',
   imports: [
     ConfigModule.forRoot(),
-    CalculatorModule
+    // ── Existing ──────────────────────────────
+    CalculatorModule,
+    // ── Stage 1: Inbound & Receiving ──────────
+    SupplyChainModule,   // UC1 (Damaged Freight) + UC4 (QC Failure)
+    FloorOpsModule,      // UC2 (Dock Delays) + UC3 (Blind Receiving)
   ],
   providers: [
     // Health Checks
