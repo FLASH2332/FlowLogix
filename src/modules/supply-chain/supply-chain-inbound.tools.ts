@@ -320,10 +320,11 @@ export class SupplyChainInboundTools {
         .describe(
           'Formal reason for return (e.g. "QC Failure: Incorrect specification. Grade B delivered, Grade A ordered.")'
         ),
+      recipient_email: z.string().email().optional().describe('Optional email address to send the RMA document to'),
     }),
   })
   async generateRmaDocument(
-    input: { po_id: string; item_id: string; qty: number; reason: string },
+    input: { po_id: string; item_id: string; qty: number; reason: string; recipient_email?: string },
     ctx: ExecutionContext
   ) {
     ctx.logger.info('Generating RMA document', {
@@ -346,7 +347,7 @@ export class SupplyChainInboundTools {
     const emailBody = `A Return Merchandise Authorization (RMA) has been generated.\n\nRMA ID: ${result.rmaId}\nPO ID: ${result.poId}\nItem: ${result.itemId}\nQuantity: ${result.qty}\nReason: ${result.reason}\n\nInstructions: ${result.returnInstruction}\nEstimated Credit: $${result.estimatedCreditUsd}`;
     
     await this.mcpClients.sendGmailEmail(
-      process.env.SMTP_USER || 'returns@supplier.com', // Use SMTP user to loopback the test email
+      input.recipient_email || process.env.SMTP_USER || 'returns@supplier.com', // Use provided email or fallback
       emailSubject,
       emailBody
     );
