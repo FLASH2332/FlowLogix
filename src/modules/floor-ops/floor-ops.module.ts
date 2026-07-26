@@ -14,7 +14,8 @@ import { FloorOpsInboundTools } from './floor-ops-inbound.tools.js';
 @Module({
   name: 'floor-ops',
   description: 'Floor Operations Agent — manages dock doors, worker assignments, and physical receiving logistics',
-  providers: [DockService, FloorOpsInboundTools],
+  providers: [DockService],
+  controllers: [FloorOpsInboundTools],
   exports: [DockService],
 })
 export class FloorOpsModule {}

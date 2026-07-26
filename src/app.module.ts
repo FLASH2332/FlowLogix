@@ -3,10 +3,13 @@ import { SupplyChainModule } from './modules/supply-chain/supply-chain.module.js
 import { FloorOpsModule } from './modules/floor-ops/floor-ops.module.js';
 import { SystemHealthCheck } from './health/system.health.js';
 
+import { OrchestratorModule } from './modules/orchestrator/orchestrator.module.js';
+
 /**
  * Root Application Module — FlowLogix Warehouse Management System
  *
  * Registers all feature modules:
+ *   - OrchestratorModule:  Orchestrator Agent (Gatekeeping, Routing)
  *   - SupplyChainModule:   Supply Chain Agent (UC1: Damaged Freight, UC4: QC Failure)
  *   - FloorOpsModule:      Floor Operations Agent (UC2: Dock Delays, UC3: Blind Receiving)
  */
@@ -26,6 +29,7 @@ import { SystemHealthCheck } from './health/system.health.js';
   imports: [
     ConfigModule.forRoot(),
     // ── Stage 1: Inbound & Receiving ──────────
+    OrchestratorModule,  // Gatekeeper Agent
     SupplyChainModule,   // UC1 (Damaged Freight) + UC4 (QC Failure)
     FloorOpsModule,      // UC2 (Dock Delays) + UC3 (Blind Receiving)
   ],

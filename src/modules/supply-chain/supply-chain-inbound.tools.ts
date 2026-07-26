@@ -1,4 +1,4 @@
-import { ToolDecorator as Tool, Widget, ExecutionContext, z } from '@nitrostack/core';
+import { ToolDecorator as Tool, ControllerDecorator as Controller, Widget, ExecutionContext, z } from '@nitrostack/core';
 import { InboundService } from './services/inbound.service.js';
 import { SupplierService } from './services/supplier.service.js';
 
@@ -9,11 +9,10 @@ import { SupplierService } from './services/supplier.service.js';
  * Agent: Supply Chain Agent
  * Stage: Stage 1 — Inbound & Receiving
  */
+@Controller('supply_chain')
 export class SupplyChainInboundTools {
-  constructor(
-    private readonly inboundService: InboundService,
-    private readonly supplierService: SupplierService
-  ) {}
+  private readonly inboundService = new InboundService();
+  private readonly supplierService = new SupplierService();
 
   // ══════════════════════════════════════════════════════════
   // USE CASE 1: Damaged Freight Dispute & Emergency Sourcing

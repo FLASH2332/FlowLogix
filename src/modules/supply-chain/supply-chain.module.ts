@@ -15,7 +15,8 @@ import { SupplyChainInboundTools } from './supply-chain-inbound.tools.js';
 @Module({
   name: 'supply-chain',
   description: 'Supply Chain Agent — manages inbound freight, stock levels, and supplier communication',
-  providers: [InboundService, SupplierService, SupplyChainInboundTools],
+  providers: [InboundService, SupplierService],
+  controllers: [SupplyChainInboundTools],
   exports: [InboundService, SupplierService],
 })
 export class SupplyChainModule {}

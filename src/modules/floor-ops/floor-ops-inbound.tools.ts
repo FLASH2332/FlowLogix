@@ -1,15 +1,16 @@
-import { ToolDecorator as Tool, Widget, ExecutionContext, z } from '@nitrostack/core';
+import { ToolDecorator as Tool, ControllerDecorator as Controller, Widget, ExecutionContext, z } from '@nitrostack/core';
 import { DockService } from './services/dock.service.js';
 
 /**
  * Floor Operations Agent — Inbound Tools
  *
- * Handles: UC2 (Inbound Traffic Delay & Dock Re-scheduling) and UC3 (Blind Receiving)
+ * Handles: UC2 (Dock Door Assignment) and UC3 (Blind Receiving)
  * Agent: Floor Operations Agent
  * Stage: Stage 1 — Inbound & Receiving
  */
+@Controller('floor_ops')
 export class FloorOpsInboundTools {
-  constructor(private readonly dockService: DockService) {}
+  private readonly dockService = new DockService();
 
   // ══════════════════════════════════════════════════════════
   // USE CASE 2: Inbound Traffic Delay & Dock Re-scheduling
