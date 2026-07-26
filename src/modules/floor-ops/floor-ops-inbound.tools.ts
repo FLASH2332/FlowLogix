@@ -1,5 +1,6 @@
 import { ToolDecorator as Tool, ControllerDecorator as Controller, Widget, ExecutionContext, z } from '@nitrostack/core';
 import { DockService } from './services/dock.service.js';
+import { McpClientsService } from '../../services/mcp-clients.service.js';
 
 /**
  * Floor Operations Agent — Inbound Tools
@@ -11,6 +12,7 @@ import { DockService } from './services/dock.service.js';
 @Controller('floor_ops')
 export class FloorOpsInboundTools {
   private readonly dockService = new DockService();
+  private mcpClients = new McpClientsService();
 
   // ══════════════════════════════════════════════════════════
   // USE CASE 2: Inbound Traffic Delay & Dock Re-scheduling
@@ -99,8 +101,13 @@ export class FloorOpsInboundTools {
     ctx.logger.info('Dock slot rescheduled', {
       from: result.originalDoorId,
       to: result.newDoorId,
-      newArrival: result.newScheduledArrival,
+      eta: result.newScheduledArrival,
     });
+
+    await this.mcpClients.sendSlackMessage(
+      '#dock-workers',
+      `🚨 *DOCK CHANGE:* Truck ${input.truck_id} has been delayed. Re-assigned from Dock ${result.originalDoorId} to Dock ${result.newDoorId} (ETA: ${result.newScheduledArrival}).`
+    );
 
     return result;
   }
@@ -219,5 +226,150 @@ export class FloorOpsInboundTools {
     });
 
     return result;
+  }
+
+  // ══════════════════════════════════════════════════════════
+  // STAGE 2: Putaway & Storage Slotting
+  // ══════════════════════════════════════════════════════════
+
+  /**
+   * replan_putaway
+   * Core routing engine for Hazmat constraints and Heavy Freight.
+   */
+  @Tool({
+    name: 'replan_putaway',
+    description:
+      'Plans the putaway route for a pallet based on its weight and hazmat status. ' +
+      'Enforces safety constraints (e.g. heavy items on ground slots, hazmat in ventilated zones). ' +
+      'Returns the assigned bin location and specific instructions.',
+    inputSchema: z.object({
+      sku: z.string().describe('Item SKU being put away'),
+      weight: z.number().describe('Weight of the pallet in kg'),
+      is_hazmat: z.boolean().describe('Whether the item is hazardous material'),
+    }),
+  })
+  async replanPutaway(
+    input: { sku: string; weight: number; is_hazmat: boolean },
+    ctx: ExecutionContext
+  ) {
+    ctx.logger.info('Replanning putaway', input);
+
+    // Mock logic based on constraints
+    let assignedSlot = 'Zone B, Rack B-02';
+    let instructions = 'Standard putaway procedures apply.';
+    let warning = null;
+
+    if (input.is_hazmat) {
+      assignedSlot = 'Zone H (Hazardous/Ventilated), Bin H-12';
+      instructions = 'Strict isolation required. Use ventilated Zone H.';
+      warning = 'HAZMAT DETECTED';
+      await this.mcpClients.sendSlackMessage('#warehouse-safety', `⚠️ *HAZMAT ALERT:* Pallet of ${input.sku} requires putaway. Ensure PPE is worn. Assigned to ${assignedSlot}.`);
+    } else if (input.weight > 500) {
+      assignedSlot = 'Ground Slot G-04';
+      instructions = 'Pallet exceeds vertical rack safety limits. Route to ground storage.';
+      warning = 'OVERWEIGHT PALLET';
+      await this.mcpClients.sendSlackMessage('#warehouse-safety', `⚠️ *HEAVY PALLET ALERT:* Pallet of ${input.sku} (${input.weight}kg) exceeds vertical rack limits. Assigned to ${assignedSlot}.`);
+    }
+
+    return {
+      sku: input.sku,
+      assignedSlot,
+      instructions,
+      warning
+    };
+  }
+
+  /**
+   * check_cross_dock_opportunity
+   * Solves Use Case 1 by bypassing shelves entirely.
+   */
+  @Tool({
+    name: 'check_cross_dock_opportunity',
+    description:
+      'Checks if an inbound SKU has an active outbound order waiting for it, allowing it to bypass storage entirely. ' +
+      'Returns the cross-docking opportunity details if one exists.',
+    inputSchema: z.object({
+      sku: z.string().describe('The inbound SKU to check for cross-docking (e.g. "SKU-002")'),
+    }),
+  })
+  async checkCrossDockOpportunity(
+    input: { sku: string },
+    ctx: ExecutionContext
+  ) {
+    ctx.logger.info('Checking cross-dock opportunity', input);
+
+    // Mock logic: SKU-002 has an active order
+    if (input.sku === 'SKU-002') {
+      return {
+        isEligible: true,
+        outboundOrder: 'ORD-901',
+        customer: 'Tata Motors',
+        destinationDock: 'Dock 4',
+        message: 'Skip storage. Drive this pallet directly from Receiving Dock to Dock 4.'
+      };
+    }
+
+    return {
+      isEligible: false,
+      message: 'No active cross-dock orders. Proceed to standard putaway.'
+    };
+  }
+
+  // ══════════════════════════════════════════════════════════
+  // STAGE 3: Inventory Control, Telemetry & Holding
+  // ══════════════════════════════════════════════════════════
+
+  /**
+   * get_telemetry_alerts
+   * Triggers Use Case 1 (Cold Chain Excursion).
+   */
+  @Tool({
+    name: 'get_telemetry_alerts',
+    description:
+      'Checks the live IoT telemetry sensors for any threshold breaches. ' +
+      'Returns active alerts such as temperature or humidity excursions.',
+    inputSchema: z.object({
+      zone: z.string().describe('The warehouse zone to check (e.g. "CC" for Cold Storage)'),
+    }),
+  })
+  async getTelemetryAlerts(
+    input: { zone: string },
+    ctx: ExecutionContext
+  ) {
+    ctx.logger.info('Checking telemetry for zone', input);
+
+    if (input.zone === 'CC' || input.zone === 'Cold Storage') {
+      await this.mcpClients.sendSlackMessage(
+        '#maintenance',
+        `🚨 *CRITICAL EXCURSION:* Zone CC temperature spiked to 10.2°C (Threshold: 8.0°C). $35,000 risk. Evacuation required immediately.`
+      );
+      
+      await this.mcpClients.sendGmailEmail(
+        'facility@warehouse.com',
+        'CRITICAL: Cold Chain Temperature Breach in Zone CC',
+        'Official Incident Report:\nZone CC temperature spiked to 10.2°C (Threshold: 8.0°C). Estimated financial risk is $35,000. Emergency evacuation procedure initiated.'
+      );
+
+      return {
+        hasAlerts: true,
+        alerts: [
+          {
+            type: 'TEMPERATURE_BREACH',
+            sensorId: 'SENSOR-CC-09',
+            currentValue: '10.2°C',
+            threshold: '8.0°C',
+            status: 'CRITICAL',
+            financialRiskUsd: 35000,
+            message: 'Temperature spiked to 10.2°C (Threshold: 8.0°C). Evacuation required.'
+          }
+        ]
+      };
+    }
+
+    return {
+      hasAlerts: false,
+      alerts: [],
+      message: 'All sensors normal.'
+    };
   }
 }

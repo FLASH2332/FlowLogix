@@ -354,4 +354,56 @@ export class SupplyChainInboundTools {
 
     return result;
   }
+
+  // ══════════════════════════════════════════════════════════
+  // STAGE 3: Inventory Control, Telemetry & Holding
+  // ══════════════════════════════════════════════════════════
+
+  /**
+   * calculate_days_of_supply
+   * Triggers Use Case 3 (Real-Time Stockout).
+   */
+  @Tool({
+    name: 'calculate_days_of_supply',
+    description:
+      'Calculates the Days of Supply (DOS) for a given SKU based on current stock levels and daily consumption rate. ' +
+      'Identifies if the SKU is falling below the safety threshold.',
+    inputSchema: z.object({
+      sku: z.string().describe('The SKU to analyze (e.g. "SKU-104")'),
+    }),
+  })
+  async calculateDaysOfSupply(
+    input: { sku: string },
+    ctx: ExecutionContext
+  ) {
+    ctx.logger.info('Calculating DOS for SKU', input);
+
+    // Mock logic: Returns critical DOS for SKU-104
+    if (input.sku === 'SKU-104') {
+      await this.mcpClients.sendSlackMessage(
+        '#procurement-team',
+        `⚠️ *STOCKOUT WARNING:* ${input.sku} is down to 3 days of supply (Safety threshold is 7 days). Auto-replenishment PO draft generated.`
+      );
+
+      return {
+        sku: 'SKU-104',
+        currentStock: 150,
+        dailyConsumptionRate: 50,
+        daysOfSupply: 3,
+        safetyThresholdDays: 7,
+        status: 'CRITICAL',
+        message: 'Days of supply (3 days) has fallen below the safety threshold (7 days). Replenishment required immediately.'
+      };
+    }
+
+    return {
+      sku: input.sku,
+      currentStock: 1200,
+      dailyConsumptionRate: 40,
+      daysOfSupply: 30,
+      safetyThresholdDays: 7,
+      status: 'HEALTHY',
+      message: 'Stock levels are healthy.'
+    };
+  }
 }
