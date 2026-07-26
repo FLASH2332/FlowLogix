@@ -13,12 +13,18 @@ import 'dotenv/config';
 import { McpApplicationFactory } from '@nitrostack/core';
 import { AppModule } from './app.module.js';
 
+import { registerExternalMcpTools } from './mcp-gateway.js';
+
 /**
  * Bootstrap the application
  */
 async function bootstrap() {
   // Create and start the MCP server
   const server = await McpApplicationFactory.create(AppModule);
+  
+  // Connect to all external MCP servers and dynamically register tools
+  await registerExternalMcpTools(server);
+
   await server.start();
 }
 

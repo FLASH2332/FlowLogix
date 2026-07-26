@@ -99,9 +99,14 @@
         }
       ],
       "tags": ["floor-ops", "inbound", "dock", "delay", "stage-1"]
+    },
+    {
+      "uri": "/warehouse-health-summary",
+      "name": "Warehouse Health Summary",
+      "description": "Master RED/AMBER/GREEN status dashboard",
+      "examples": [],
+      "tags": ["dashboard", "health"]
     }
   ],
   "generatedAt": "2026-07-25T12:47:00.000Z"
 }
-
-
