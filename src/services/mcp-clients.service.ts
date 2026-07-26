@@ -75,7 +75,7 @@ export class McpClientsService {
       await client.callTool({
         name: 'slack_post_message',
         arguments: {
-          channel_id: channel.replace('#', ''), // Usually needs channel ID or string
+          channel_id: 'D0BKWSRK4UC', // OVERRIDDEN FOR TESTING (was: channel.replace('#', ''))
           text,
         },
       });
