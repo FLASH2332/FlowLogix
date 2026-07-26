@@ -24,7 +24,7 @@ export class McpClientsService {
     try {
       const transport = new StdioClientTransport({
         command: 'npx',
-        args: ['--no-install', '@modelcontextprotocol/server-slack'],
+        args: ['-y', '@modelcontextprotocol/server-slack'],
         env: process.env as Record<string, string>, // Pass current env (contains SLACK_BOT_TOKEN)
       });
       const client = new Client({ name: 'flowlogix-slack-client', version: '1.0.0' }, { capabilities: {} });
@@ -53,7 +53,7 @@ export class McpClientsService {
     try {
       const transport = new StdioClientTransport({
         command: 'npx',
-        args: ['--no-install', '@martinzarfl/mail-mcp'],
+        args: ['-y', '@martinzarfl/mail-mcp'],
         env: process.env as Record<string, string>, // Pass current env (contains SMTP_* vars)
       });
       const client = new Client({ name: 'flowlogix-gmail-client', version: '1.0.0' }, { capabilities: {} });
