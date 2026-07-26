@@ -58,24 +58,7 @@ The **Model Context Protocol (MCP)** is an open standard that lets AI assistants
 
 ## Architecture & Multi-MCP Integration
 
-                           ┌───────────────────────────┐
-                           │     Orchestrator LLM      │
-                           │  (LangGraph / ChatOpenAI) │
-                           └─────────────┬─────────────┘
-                                         │
-                   ┌─────────────────────┴─────────────────────┐
-                   │   FlowLogix Multi-MCP Transport Layer     │
-                   └──────┬─────────────────────────────┬──────┘
-                          │                             │
-          (STDIO Local)   │                             │  (SSE Remote / Render)
-                          ▼                             ▼
-            ┌──────────────────────────┐  ┌──────────────────────────┐
-            │ NitroStack Core Server   │  │ External Cloud MCP Hub   │
-            │  - 15+ Local TS Tools    │  │  - Slack MCP (/sse)      │
-            │  - Deterministic Math    │  │  - Mail MCP (/sse)       │
-            │  - Persistent Memory     │  └──────────────────────────┘
-            │  - React HITL Widgets    │
-            └──────────────────────────┘
+![Architecture Diagram](assets/architecture.png)
 
 ---
 
