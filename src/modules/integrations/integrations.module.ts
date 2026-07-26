@@ -20,39 +20,23 @@ import {
   providers: [
     {
       provide: VISION_SERVICE,
-      useFactory: (config: ConfigService) => {
-        // Example check: if (config.get('USE_MOCK_MCPS') !== 'false')
-        return new MockVisionService(config.logger);
-      },
-      inject: [ConfigService]
+      useClass: MockVisionService
     },
     {
       provide: AIRTABLE_SERVICE,
-      useFactory: (config: ConfigService) => {
-        return new MockAirtableService(config.logger);
-      },
-      inject: [ConfigService]
+      useClass: MockAirtableService
     },
     {
       provide: SLACK_SERVICE,
-      useFactory: (config: ConfigService) => {
-        return new MockSlackService(config.logger);
-      },
-      inject: [ConfigService]
+      useClass: MockSlackService
     },
     {
       provide: GMAIL_SERVICE,
-      useFactory: (config: ConfigService) => {
-        return new MockGmailService(config.logger);
-      },
-      inject: [ConfigService]
+      useClass: MockGmailService
     },
     {
       provide: TOMTOM_SERVICE,
-      useFactory: (config: ConfigService) => {
-        return new MockTomTomService(config.logger);
-      },
-      inject: [ConfigService]
+      useClass: MockTomTomService
     }
   ],
   exports: [

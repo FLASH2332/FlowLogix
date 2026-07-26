@@ -23,7 +23,7 @@ export class FloorOpsInboundTools {
       new_time: z.string()
     })
   })
-  @Widget('dock-schedule-tracker')
+  // @Widget('dock-schedule-tracker')
   async rescheduleDockSlot(input: { truck_id: string; new_time: string }, ctx: ExecutionContext) {
     return this.dockService.rescheduleDockSlot(input.truck_id, input.new_time);
   }

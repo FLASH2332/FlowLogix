@@ -26,7 +26,7 @@ export class OrchestratorTools {
     description: 'Pulls the master RED/AMBER/GREEN status of the warehouse.',
     inputSchema: z.object({})
   })
-  @Widget('warehouse-health-summary')
+  // @Widget('warehouse-health-summary')
   async getWarehouseSummary(input: any, ctx: ExecutionContext) {
     return this.orchestratorService.getWarehouseSummary();
   }

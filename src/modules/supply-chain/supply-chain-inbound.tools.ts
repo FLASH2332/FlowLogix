@@ -13,7 +13,7 @@ export class SupplyChainInboundTools {
       forced_damaged_qty: z.number().optional().describe('Override OCR damage count')
     })
   })
-  @Widget('shipment-incident-card')
+  // @Widget('shipment-incident-card')
   async readDeliveryReceiptOcr(input: { file_content: string; forced_damaged_qty?: number }, ctx: ExecutionContext) {
     ctx.logger.info('OCR reading delivery receipt...');
     return this.inboundService.processDeliveryReceipt(input.file_content, input.forced_damaged_qty);
@@ -54,7 +54,7 @@ export class SupplyChainInboundTools {
       approved: z.boolean()
     })
   })
-  @Widget('emergency-po-approval')
+  // @Widget('emergency-po-approval')
   async raiseEmergencyPo(input: { supplier_id: string; sku: string; qty: number; approved: boolean }, ctx: ExecutionContext) {
     return this.inboundService.raiseEmergencyPO(input.supplier_id, input.sku, input.qty, input.approved);
   }

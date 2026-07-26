@@ -1,4 +1,5 @@
 import { McpApp, Module, ConfigModule } from '@nitrostack/core';
+import { IntegrationsModule } from './modules/integrations/integrations.module.js';
 import { SupplyChainModule } from './modules/supply-chain/supply-chain.module.js';
 import { FloorOpsModule } from './modules/floor-ops/floor-ops.module.js';
 import { OrchestratorModule } from './modules/orchestrator/orchestrator.module.js';
@@ -26,6 +27,7 @@ import { SystemHealthCheck } from './health/system.health.js';
   description: 'Root application module',
   imports: [
     ConfigModule.forRoot(),
+    IntegrationsModule,
     SupplyChainModule,
     FloorOpsModule,
     OrchestratorModule
