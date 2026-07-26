@@ -1,6 +1,7 @@
 import { ToolDecorator as Tool, ControllerDecorator as Controller, Widget, ExecutionContext, z } from '@nitrostack/core';
 import { InboundService } from './services/inbound.service.js';
 import { SupplierService } from './services/supplier.service.js';
+import { McpClientsService } from '../../services/mcp-clients.service.js';
 
 /**
  * Supply Chain Agent — Inbound Tools
@@ -13,6 +14,7 @@ import { SupplierService } from './services/supplier.service.js';
 export class SupplyChainInboundTools {
   private readonly inboundService = new InboundService();
   private readonly supplierService = new SupplierService();
+  private readonly mcpClients = new McpClientsService();
 
   // ══════════════════════════════════════════════════════════
   // USE CASE 1: Damaged Freight Dispute & Emergency Sourcing
@@ -218,6 +220,21 @@ export class SupplyChainInboundTools {
       ctx.logger.info('HITL Approved — Slack notification dispatched', {
         channel: result.slackPayload.channel,
       });
+      // Fire Slack message
+      await this.mcpClients.sendSlackMessage(
+        result.slackPayload.channel,
+        result.slackPayload.text
+      );
+
+      // Fire Gmail email
+      const emailSubject = `Emergency PO ${result.poId} - ${result.sku}`;
+      const emailBody = `An Emergency Purchase Order has been approved.\n\nPO ID: ${result.poId}\nSKU: ${result.sku}\nQuantity: ${result.qty}\nTotal Cost: $${result.estimatedTotalCostUsd}\nEstimated Delivery: ${result.estimatedDeliveryDate}`;
+      
+      await this.mcpClients.sendGmailEmail(
+        process.env.SMTP_USER || 'procurement@alphaauto.in', // Use SMTP user to loopback the test email
+        emailSubject,
+        emailBody
+      );
     }
 
     return result;
@@ -323,6 +340,17 @@ export class SupplyChainInboundTools {
     );
 
     ctx.logger.info('RMA document created', { rmaId: result.rmaId, status: result.status });
+
+    // Fire Gmail email with RMA details
+    const emailSubject = `RMA Generated: ${result.rmaId} for PO ${result.poId}`;
+    const emailBody = `A Return Merchandise Authorization (RMA) has been generated.\n\nRMA ID: ${result.rmaId}\nPO ID: ${result.poId}\nItem: ${result.itemId}\nQuantity: ${result.qty}\nReason: ${result.reason}\n\nInstructions: ${result.returnInstruction}\nEstimated Credit: $${result.estimatedCreditUsd}`;
+    
+    await this.mcpClients.sendGmailEmail(
+      process.env.SMTP_USER || 'returns@supplier.com', // Use SMTP user to loopback the test email
+      emailSubject,
+      emailBody
+    );
+
     return result;
   }
 }
